@@ -7,6 +7,8 @@ var collections = require('metalsmith-collections')
 var markdown = require('metalsmith-markdownit')
 var layouts = require('metalsmith-layouts')
 var minify = require('metalsmith-html-minifier')
+var defaults = require('metalsmith-default-values')
+var drafts = require('metalsmith-drafts')
 // PostCSS
 var postcss = require('postcss')
 // PDF
@@ -22,6 +24,7 @@ var siteBuild = Metalsmith(__dirname)
     'site': 'site.yaml',
     'person': 'person.yaml'
   }))
+  .use(drafts())
   .use(collections({
     education: {
       pattern: 'education/**/*.md',
@@ -37,6 +40,12 @@ var siteBuild = Metalsmith(__dirname)
       pattern: '*.md'
     }
   }))
+  .use(defaults([{
+    pattern: '*/**/*.md',
+    defaults: {
+      draft: true
+    }
+  }]))
   // HTML
   .use(markdown({
     html: true,
@@ -57,6 +66,7 @@ var siteBuild = Metalsmith(__dirname)
     default: 'default.pug',
     pattern: '**/*.html'
   }))
+  .use(drafts())
 
 if (process.env.NODE_ENV === 'production') {
   siteBuild.use(minify())
